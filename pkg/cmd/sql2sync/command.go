@@ -3,9 +3,10 @@ package sql2sync
 import (
 	"crypto/tls"
 	"encoding/json"
+	"log"
 	"net"
+	"os"
 
-	"github.com/golang/glog"
 	"github.com/spf13/cobra"
 
 	streamquery "github.com/mcluseau/sql2sync/pkg/stream-query"
@@ -51,10 +52,10 @@ func New() *cobra.Command {
 
 func run(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
-		glog.Fatal("The query is required.")
+		log.Fatal("The query is required.")
 	}
 	if len(sq.KeyColumns) == 0 {
-		glog.Fatal("One or more keys are required.")
+		log.Fatal("One or more keys are required.")
 	}
 
 	// connect to target
@@ -77,11 +78,11 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal("failed to connect to server: ", err)
 	}
 
 	defer conn.Close()
-	glog.Info("connected to target server")
+	log.Print("connected to server")
 
 	// start the query
 	sq.Query = args[0]
@@ -93,7 +94,7 @@ func run(cmd *cobra.Command, args []string) {
 	dec := json.NewDecoder(conn)
 
 	if err = enc.Encode(syncInit); err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	for kv := range kvs {
@@ -101,21 +102,25 @@ func run(cmd *cobra.Command, args []string) {
 			Key:   kv.Key,
 			Value: kv.Value,
 		}); err != nil {
-			glog.Fatal(err)
+			log.Fatal(err)
 		}
 	}
 
-	glog.Info("end of data")
+	log.Print("end of data")
 	if err = enc.Encode(client.BinaryKV{EndOfTransfer: true}); err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
-	glog.Info("waiting for result...")
+	log.Print("waiting for result...")
 
 	result := client.SyncResult{}
 	if err = dec.Decode(&result); err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
-	glog.Info("result: ", result.OK)
+	log.Print("result: ", result.OK)
+
+	if !result.OK {
+		os.Exit(1)
+	}
 }

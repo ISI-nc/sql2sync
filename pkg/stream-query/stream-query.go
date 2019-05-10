@@ -3,11 +3,11 @@ package streamquery
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/golang/glog"
 	"github.com/spf13/pflag"
 
 	"github.com/mcluseau/sql2sync/pkg/db"
@@ -45,15 +45,15 @@ func (sq *StreamQuery) StreamTo(output chan KeyValue) {
 		query = fmt.Sprintf("select * from (%s) order by \"%s\"", query, strings.Join(sq.KeyColumns, "\", \""))
 	}
 
-	glog.Info("Running query: ", query)
+	log.Print("Running query: ", query)
 	rows, err := db.DB.Query(query)
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	columns, err := rows.Columns()
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	values := make([]interface{}, len(columns))
@@ -67,17 +67,17 @@ func (sq *StreamQuery) StreamTo(output chan KeyValue) {
 
 	buildKey, ok := keyBuilders[keyBuilder]
 	if !ok {
-		glog.Fatal("Unknown key builder ", keyBuilder)
+		log.Fatal("Unknown key builder ", keyBuilder)
 	}
 
 	for rows.Next() {
 		if err := rows.Scan(valueRefs...); err != nil {
-			glog.Fatal(err)
+			log.Fatal(err)
 		}
 
 		scans++
 		if now := time.Now(); now.Sub(lastMsg) >= 5*time.Second {
-			glog.Info("Processing: scanned ", scans, " rows.")
+			log.Print("Processing: scanned ", scans, " rows.")
 			lastMsg = now
 		}
 
@@ -108,17 +108,17 @@ func (sq *StreamQuery) StreamTo(output chan KeyValue) {
 	}
 	rows.Close()
 	if err := rows.Err(); err != nil {
-		glog.Error(reflect.TypeOf(err))
-		glog.Error(string(mustMarshal(err)))
-		glog.Fatal(err)
+		log.Print(reflect.TypeOf(err))
+		log.Print(string(mustMarshal(err)))
+		log.Fatal(err)
 	}
-	glog.Info("Scanned ", scans, " rows.")
+	log.Print("Scanned ", scans, " rows.")
 }
 
 func mustMarshal(v interface{}) []byte {
 	ba, err := json.Marshal(v)
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 	return ba
 }

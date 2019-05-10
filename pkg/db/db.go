@@ -2,12 +2,12 @@ package db
 
 import (
 	"database/sql"
+	"log"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/golang/glog"
 	"github.com/spf13/pflag"
 )
 
@@ -16,6 +16,8 @@ var (
 	DB          *sql.DB
 	firstConnOk = false
 	lock        sync.Mutex
+
+	Debug = false
 )
 
 func RegisterFlags(defaultDriver, defaultConnStr string, flag *pflag.FlagSet) {
@@ -39,7 +41,7 @@ func Connect() {
 		return
 	}
 
-	glog.Info("Connecting to database")
+	log.Print("Connecting to database")
 
 	lock.Lock()
 	defer lock.Unlock()
@@ -55,26 +57,33 @@ func Connect() {
 			time.Sleep(1 * time.Second)
 			continue
 		} else {
-			glog.Fatal("Database connection failed.")
+			log.Fatal("Database connection failed.")
 		}
 	}
 	firstConnOk = true
-	glog.Info("Connected to database.")
+	log.Print("Connected to database.")
 }
 
 // Tries to connect to database, returns true iff the connection is successful
 func tryConnect() bool {
 	var err error
 
-	glog.V(4).Info("sql.Open(\"", driver, "\", ...)")
+	if Debug {
+		log.Print("sql.Open(\"", driver, "\", ...)")
+	}
+
 	DB, err = sql.Open(driver, dsn)
 	if err != nil {
-		glog.Error("Failed to connect to database (", dsn, "): ", err)
+		log.Print("Failed to connect to database (", dsn, "): ", err)
 		return false
 	}
-	glog.V(4).Info("sql.Ping()")
+
+	if Debug {
+		log.Print("sql.Ping()")
+	}
+
 	if err = DB.Ping(); err != nil {
-		glog.Error("Failed to ping database (driver ", driver, ", ", dsn, "): ", err)
+		log.Print("Failed to ping database (driver ", driver, ", ", dsn, "): ", err)
 		return false
 	}
 	return true
@@ -85,17 +94,19 @@ func Close() {
 		return
 	}
 
-	glog.Info("Closing connection to database...")
+	log.Print("Closing connection to database...")
 
 	lock.Lock()
 	defer lock.Unlock()
 
-	glog.V(4).Info("sql.Close()")
+	if Debug {
+		log.Print("sql.Close()")
+	}
+
 	if err := DB.Close(); err != nil {
-		glog.Error("error closing connection: ", err)
+		log.Print("error closing connection: ", err)
 	}
 	DB = nil
-	glog.V(1).Info("Database connection closed.")
 }
 
 func Reconnect() {

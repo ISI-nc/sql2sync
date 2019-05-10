@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go v0.38.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190204142019-df6d76eb9289
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/lib/pq v1.1.1
 	github.com/mattn/go-sqlite3 v1.10.0

@@ -4,11 +4,10 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"sort"
 	"strconv"
-
-	"github.com/golang/glog"
 )
 
 // Available key builders.
@@ -41,7 +40,7 @@ func jsonObjectKey(columns []string, values []interface{}) []byte {
 	}
 	ba, err := json.Marshal(kv)
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 	return ba
 }
@@ -49,14 +48,14 @@ func jsonObjectKey(columns []string, values []interface{}) []byte {
 func jsonArrayKey(columns []string, values []interface{}) []byte {
 	ba, err := json.Marshal(values)
 	if err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 	return ba
 }
 
 func value(columns []string, values []interface{}) []byte {
 	if len(columns) > 1 {
-		glog.Fatal("Key-Builders value can only be used with 1 value")
+		log.Fatal("Key-Builders value can only be used with 1 value")
 	}
 
 	switch v := values[0].(type) {
@@ -72,7 +71,7 @@ func value(columns []string, values []interface{}) []byte {
 		return []byte(strconv.FormatFloat(v, 'f', -1, 64))
 	default:
 		fmt.Printf("The key is: %+v\n", reflect.TypeOf(v))
-		glog.Fatal("The key is neither a string/int/float")
+		log.Fatal("The key is neither a string/int/float")
 	}
 
 	// should never happen

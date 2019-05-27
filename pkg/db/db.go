@@ -83,7 +83,7 @@ func tryConnect() bool {
 	}
 
 	if err = DB.Ping(); err != nil {
-		log.Print("Failed to ping database (driver ", driver, ", ", dsn, "): ", err)
+		log.Print("Failed to ping database: ", err)
 		return false
 	}
 	return true

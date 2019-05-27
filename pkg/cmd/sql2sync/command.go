@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mcluseau/sql2sync/pkg/db"
 	streamquery "github.com/mcluseau/sql2sync/pkg/stream-query"
 	client "github.com/mcluseau/sql2sync/pkg/sync2kafka-client" // FIXME create a real package
 )
@@ -78,11 +79,14 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		log.Fatal("failed to connect to server: ", err)
+		log.Fatal("failed to connect to target: ", err)
 	}
 
 	defer conn.Close()
-	log.Print("connected to server")
+	log.Print("connected to target")
+
+	// connect to database
+	db.Connect()
 
 	// start the query
 	sq.Query = args[0]

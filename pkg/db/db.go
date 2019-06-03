@@ -20,6 +20,10 @@ var (
 	Debug = false
 )
 
+func Driver() string {
+	return driver
+}
+
 func RegisterFlags(defaultDriver, defaultConnStr string, flag *pflag.FlagSet) {
 	// Driver
 	driver = os.Getenv("DATA_SOURCE_DRIVER")
@@ -47,6 +51,7 @@ func Connect() {
 	defer lock.Unlock()
 
 	if !strings.HasSuffix(os.Getenv("NLS_LANG"), "UTF8") {
+		// help oracle...
 		os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 	}
 

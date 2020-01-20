@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/mcluseau/sql2sync/pkg/db"
+	"github.com/isi-nc/sql2sync/pkg/db"
 )
 
 type StreamQuery struct {

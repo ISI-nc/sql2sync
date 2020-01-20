@@ -1,4 +1,4 @@
-module github.com/mcluseau/sql2sync
+module github.com/isi-nc/sql2sync
 
 go 1.12
 

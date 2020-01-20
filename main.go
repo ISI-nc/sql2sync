@@ -6,8 +6,8 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/mcluseau/sql2sync/pkg/cmd/sql2sync"
-	"github.com/mcluseau/sql2sync/pkg/db"
+	"github.com/isi-nc/sql2sync/pkg/cmd/sql2sync"
+	"github.com/isi-nc/sql2sync/pkg/db"
 )
 
 func main() {

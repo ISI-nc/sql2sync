@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mcluseau/sql2sync/pkg/db"
-	streamquery "github.com/mcluseau/sql2sync/pkg/stream-query"
-	client "github.com/mcluseau/sql2sync/pkg/sync2kafka-client" // FIXME create a real package
+	"github.com/isi-nc/sql2sync/pkg/db"
+	streamquery "github.com/isi-nc/sql2sync/pkg/stream-query"
+	client "github.com/isi-nc/sql2sync/pkg/sync2kafka-client" // FIXME create a real package
 )
 
 var (
